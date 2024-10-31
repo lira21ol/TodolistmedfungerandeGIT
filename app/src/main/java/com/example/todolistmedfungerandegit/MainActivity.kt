@@ -26,7 +26,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
 import com.example.todolistmedfungerandegit.ui.theme.TodoListMedFungerandeGITTheme
-import androidx.compose.foundation.background
+
 
 
 class MainActivity : ComponentActivity() {
@@ -48,15 +48,16 @@ data class Task(
 )
 @Composable
 fun BackgroundImage() {
-    val painter = painterResource(id = R.drawable.bakgrunden) // Ensure this resource is correct
+    val painter = painterResource(id = R.drawable.bakgrund2)
     Box(
-        modifier = Modifier.fillMaxSize() // Fill the entire screen
+        modifier = Modifier.fillMaxSize()
     ) {
         Image(
             painter = painter,
             contentDescription = null,
-            modifier = Modifier.fillMaxSize(), // Ensure the image fills the box
-            contentScale = ContentScale.Crop // Adjust image scaling
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.FillBounds,
+
         )
     }
 }
@@ -84,6 +85,7 @@ fun TaskManagerApp() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TaskListScreen(navController: NavController, taskList: MutableList<Task>) {
+
     Scaffold(
         containerColor = Color.Transparent,
         topBar = {
@@ -94,7 +96,7 @@ fun TaskListScreen(navController: NavController, taskList: MutableList<Task>) {
                     }
                 },
                 colors = TopAppBarDefaults.smallTopAppBarColors(
-                    containerColor = Color.Blue // Change to your desired color
+                    containerColor = Color.LightGray
                 )
             )
         },
@@ -110,17 +112,16 @@ fun TaskListScreen(navController: NavController, taskList: MutableList<Task>) {
                     headlineContent = {
                         Box(
                             modifier = Modifier
-                                .background(Color.Yellow) // Set your desired background color here
-                                .padding(8.dp) // Optional: Add some padding
+
                         ) {
                             Text(task.name)
                         }
                     },
+
                     supportingContent = {
                         Box(
                             modifier = Modifier
-                                .background(Color.LightGray) // Set background color for details
-                                .padding(8.dp) // Optional: Add padding
+
                         ) {
                             Text(task.details)
                         }
