@@ -19,12 +19,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
+
+
 import com.example.todolistmedfungerandegit.ui.theme.TodoListMedFungerandeGITTheme
 
 
@@ -56,7 +57,7 @@ fun BackgroundImage() {
             painter = painter,
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.FillBounds,
+
 
         )
     }
@@ -95,9 +96,7 @@ fun TaskListScreen(navController: NavController, taskList: MutableList<Task>) {
                         Text("Tasks")
                     }
                 },
-                colors = TopAppBarDefaults.smallTopAppBarColors(
-                    containerColor = Color.LightGray
-                )
+
             )
         },
         floatingActionButton = {
@@ -157,6 +156,20 @@ fun TaskListScreen(navController: NavController, taskList: MutableList<Task>) {
 fun CreateTaskScreen(navController: NavHostController, taskList: MutableList<Task>) {
     var name by remember { mutableStateOf("") }
     var details by remember { mutableStateOf("") }
+    var errorMessages by remember { mutableStateOf(emptyList<String>()) }
+
+
+    fun validateInput(name: String, details: String): List<String> {
+        val errors = mutableListOf<String>()
+        if (name.length < 3) {
+            errors.add("Task name must be at least 3 characters long.")
+        }
+
+        if (details.length > 120) {
+            errors.add("Task details must be at most 120 characters long.")
+        }
+        return errors
+    }
 
     Scaffold(
         topBar = {
@@ -170,6 +183,13 @@ fun CreateTaskScreen(navController: NavHostController, taskList: MutableList<Tas
                 .padding(16.dp),
             horizontalAlignment = Alignment.Start
         ) {
+            // Display error messages
+            if (errorMessages.isNotEmpty()) {
+                for (error in errorMessages) {
+                    Text(error, color = Color.Red)
+                }
+            }
+
             TextField(
                 value = name,
                 onValueChange = { name = it },
@@ -185,9 +205,12 @@ fun CreateTaskScreen(navController: NavHostController, taskList: MutableList<Tas
             Spacer(modifier = Modifier.height(16.dp))
             Button(
                 onClick = {
-                    if (name.isNotBlank() && details.isNotBlank()) {
-                        taskList.add(Task(id = taskList.size, name = name, details = details))
-                        navController.popBackStack() // Navigate back after adding
+                    val errors = validateInput(name, details)
+                    if (errors.isEmpty()) {
+                        taskList.add(Task(id = taskList.size + 1, name = name, details = details))
+                        navController.popBackStack()
+                    } else {
+                        errorMessages = errors
                     }
                 },
                 modifier = Modifier.align(Alignment.End)
@@ -198,11 +221,26 @@ fun CreateTaskScreen(navController: NavHostController, taskList: MutableList<Tas
     }
 }
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TaskEditScreen(navController: NavController, task: Task) {
     var name by remember { mutableStateOf(task.name) }
     var details by remember { mutableStateOf(task.details) }
+    var errorMessages by remember { mutableStateOf(emptyList<String>()) }
+
+
+    fun validateInput(name: String, details: String): List<String> {
+        val errors = mutableListOf<String>()
+        if (name.length < 3) {
+            errors.add("Task name must be at least 3 characters long.")
+        }
+
+        if (details.length > 120) {
+            errors.add("Task details must be at most 120 characters long.")
+        }
+        return errors
+    }
 
     Scaffold(
         topBar = {
@@ -216,6 +254,13 @@ fun TaskEditScreen(navController: NavController, task: Task) {
                 .padding(16.dp),
             horizontalAlignment = Alignment.Start
         ) {
+            // Display error messages
+            if (errorMessages.isNotEmpty()) {
+                for (error in errorMessages) {
+                    Text(error, color = Color.Red)
+                }
+            }
+
             TextField(
                 value = name,
                 onValueChange = { name = it },
@@ -229,10 +274,13 @@ fun TaskEditScreen(navController: NavController, task: Task) {
             )
             Spacer(modifier = Modifier.height(16.dp))
             Button(onClick = {
-                if (name.isNotBlank() && details.isNotBlank()) {
+                val errors = validateInput(name, details)
+                if (errors.isEmpty()) {
                     task.name = name
                     task.details = details
                     navController.popBackStack()
+                } else {
+                    errorMessages = errors
                 }
             }) {
                 Text("Save Changes")
@@ -240,4 +288,5 @@ fun TaskEditScreen(navController: NavController, task: Task) {
         }
     }
 }
+
 
